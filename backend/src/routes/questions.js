@@ -33,7 +33,62 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET route to fetch a single question by ID
+// GET route to search questions - MOVED BEFORE :id route
+router.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    // If no query provided, return all questions
+    if (!query) {
+      const questions = await Question.find()
+        .sort({ createdAt: -1 })
+        .populate('author', 'username email');
+      return res.json(questions);
+    }
+
+    // Split the query into individual tags, handle both commas and spaces
+    const searchTags = query
+      .toLowerCase()
+      .split(/[,\s]+/)  // Split by comma or whitespace
+      .map(tag => tag.trim())
+      .filter(Boolean);  // Remove empty strings
+
+    // Search for questions that have any of the provided tags (case insensitive)
+    const questions = await Question.find({
+      tags: { 
+        $in: searchTags.map(tag => new RegExp(`^${tag}$`, 'i'))
+      }
+    })
+    .sort({ createdAt: -1 })
+    .populate('author', 'username email');
+
+    // Calculate votes for each question
+    const questionsWithVotes = questions.map(question => {
+      const totalVotes = question.votes.reduce((acc, vote) => {
+        return acc + (vote.type === 'upvote' ? 1 : -1);
+      }, 0);
+
+      const userId = req.user?.id;
+      const userVote = userId ? question.votes.find(vote => vote.user.toString() === userId)?.type : null;
+
+      return {
+        ...question.toObject(),
+        votes: totalVotes,
+        userVote: userVote
+      };
+    });
+
+    res.json(questionsWithVotes);
+  } catch (error) {
+    console.error('Error searching questions:', error);
+    res.status(500).json({ 
+      message: 'Error searching questions', 
+      error: error.message 
+    });
+  }
+});
+
+// GET route to fetch a single question by ID - MOVED AFTER search route
 router.get('/:id', async (req, res) => {
   try {
     const question = await Question.findById(req.params.id)
@@ -189,41 +244,6 @@ router.post('/:questionId/answers', authMiddleware, async (req, res) => {
     console.error('Error adding answer:', error);
     res.status(500).json({ 
       message: 'Error adding answer', 
-      error: error.message 
-    });
-  }
-});
-
-// GET route to search questions
-router.get('/search', async (req, res) => {
-  try {
-    const { query } = req.query;
-
-    // If no query provided, return all questions
-    if (!query) {
-      const questions = await Question.find()
-        .sort({ createdAt: -1 })
-        .populate('author', 'username email');
-      return res.json(questions);
-    }
-
-    // Split the query into individual tags and clean them
-    const searchTags = query.toLowerCase().split(/[ ,]+/).filter(Boolean);
-
-    // Search for questions that have any of the provided tags
-    const questions = await Question.find({
-      tags: { 
-        $in: searchTags.map(tag => new RegExp(`^${tag}$`, 'i')) 
-      }
-    })
-    .sort({ createdAt: -1 })
-    .populate('author', 'username email');
-
-    res.json(questions);
-  } catch (error) {
-    console.error('Error searching questions:', error);
-    res.status(500).json({ 
-      message: 'Error searching questions', 
       error: error.message 
     });
   }
