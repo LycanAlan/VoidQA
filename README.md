@@ -38,7 +38,6 @@ VoidQA is a modern Q&A platform built with the MERN stack (MongoDB, Express.js, 
 - Node.js & Express.js
 - MongoDB with Mongoose
 - JWT for authentication
-- RESTful API architecture
 
 ## Getting Started
 
@@ -112,10 +111,6 @@ The application should now be running at `http://localhost:5173` (frontend) and 
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
