@@ -203,20 +203,21 @@ router.get('/search', async (req, res) => {
     if (!query) {
       const questions = await Question.find()
         .sort({ createdAt: -1 })
-        .populate('author', 'email');
+        .populate('author', 'username email');
       return res.json(questions);
     }
 
-    // Search in title, body, and tags using case-insensitive regex
+    // Split the query into individual tags and clean them
+    const searchTags = query.toLowerCase().split(/[ ,]+/).filter(Boolean);
+
+    // Search for questions that have any of the provided tags
     const questions = await Question.find({
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { body: { $regex: query, $options: 'i' } },
-        { tags: { $regex: query, $options: 'i' } }
-      ]
+      tags: { 
+        $in: searchTags.map(tag => new RegExp(`^${tag}$`, 'i')) 
+      }
     })
     .sort({ createdAt: -1 })
-    .populate('author', 'email');
+    .populate('author', 'username email');
 
     res.json(questions);
   } catch (error) {

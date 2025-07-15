@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import AskQuestion from './pages/AskQuestion';
 import QuestionDetail from './pages/QuestionDetail';
 import AnswerQuestion from './pages/AnswerQuestion';
+import SearchBar from './components/SearchBar';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,11 +30,22 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-100">
         <nav className="bg-white shadow-md">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <Link to="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600">
+          <div className="container mx-auto px-4 py-4 flex items-center">
+            <Link to="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600 shrink-0">
               VoidQA
             </Link>
+            
+            <SearchBar />
+
             <div className="flex space-x-4 items-center">
+              {isLoggedIn && (
+                <Link 
+                  to="/ask" 
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+                >
+                  Ask Question
+                </Link>
+              )}
               {isLoggedIn ? (
                 <button 
                   onClick={handleLogout}
