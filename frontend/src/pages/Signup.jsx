@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from '../utils/axiosConfig'
 
 function Signup({ setIsLoggedIn }) {
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -26,6 +27,12 @@ function Signup({ setIsLoggedIn }) {
       return
     }
 
+    // Username validation
+    if (username.length < 3) {
+      setError("Username must be at least 3 characters long")
+      return
+    }
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
@@ -38,6 +45,7 @@ function Signup({ setIsLoggedIn }) {
       
       // Call backend signup API
       const response = await axios.post('/auth/signup', {
+        username,
         email,
         password
       })
@@ -82,6 +90,18 @@ function Signup({ setIsLoggedIn }) {
           )}
           
           <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto w-full">
+            <div>
+              <label htmlFor="username" className="block text-base font-medium text-gray-700 mb-2">Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Choose a username" 
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                required
+              />
+            </div>
             <div>
               <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-2">Email</label>
               <input
