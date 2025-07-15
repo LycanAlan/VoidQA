@@ -1,19 +1,62 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
-function Signup() {
+function Signup({ setIsLoggedIn }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Implement signup logic
+    setError('')
+    
+    // Validate inputs
     if (password !== confirmPassword) {
-      alert("Passwords do not match!")
+      setError("Passwords do not match!")
       return
     }
-    console.log('Signup attempt', { email, password })
+
+    // Basic password strength check
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long")
+      return
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address")
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      
+      // Call backend signup API
+      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+        email,
+        password
+      })
+
+      // Save token to local storage
+      localStorage.setItem('token', response.data.token)
+
+      // Update login state in parent component
+      setIsLoggedIn(true)
+
+      // Redirect to home page or dashboard
+      navigate('/')
+    } catch (err) {
+      // Handle signup errors
+      setError(err.response?.data?.message || 'Signup failed. Please try again.')
+      console.error('Signup error:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -31,6 +74,13 @@ function Signup() {
         <div className="col-span-12 md:col-span-7 bg-white p-8 sm:p-12 flex flex-col justify-center">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-6">Create New Account</h2>
           <p className="text-lg text-center text-gray-600 mb-8">Sign up to our platform</p>
+          
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              {error}
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto w-full">
             <div>
               <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-2">Email</label>
@@ -70,9 +120,14 @@ function Signup() {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg text-base font-semibold hover:bg-blue-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              disabled={isLoading}
+              className={`w-full text-white py-3 rounded-lg text-base font-semibold transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+                isLoading 
+                  ? 'bg-blue-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
             <div className="flex items-center my-2">
               <div className="flex-grow border-t border-gray-200"></div>
