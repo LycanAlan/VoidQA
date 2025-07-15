@@ -4,6 +4,8 @@ import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AskQuestion from './pages/AskQuestion';
+import QuestionDetail from './pages/QuestionDetail';
+import AnswerQuestion from './pages/AnswerQuestion';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,6 +68,14 @@ function App() {
           <Route 
             path="/ask" 
             element={isLoggedIn ? <AskQuestion /> : <Login setIsLoggedIn={setIsLoggedIn} />} 
+          />
+          <Route 
+            path="/questions/:questionId" 
+            element={<QuestionDetail />} 
+          />
+          <Route 
+            path="/questions/:questionId/answer" 
+            element={isLoggedIn ? <AnswerQuestion /> : <Login setIsLoggedIn={setIsLoggedIn} />} 
           />
         </Routes>
       </div>

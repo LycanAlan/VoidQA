@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios from '../utils/axiosConfig'
 
 function Login({ setIsLoggedIn }) {
   const [email, setEmail] = useState('')
@@ -29,7 +29,7 @@ function Login({ setIsLoggedIn }) {
       setIsLoading(true)
       
       // Call backend login API
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('/auth/login', {
         email,
         password
       })

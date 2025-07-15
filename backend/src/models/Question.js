@@ -1,5 +1,18 @@
 const mongoose = require('mongoose');
 
+const VoteSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  type: {
+    type: String,
+    enum: ['upvote', 'downvote'],
+    required: true
+  }
+});
+
 const AnswerSchema = new mongoose.Schema({
   body: {
     type: String,
@@ -11,14 +24,7 @@ const AnswerSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  upvotes: {
-    type: Number,
-    default: 0
-  },
-  downvotes: {
-    type: Number,
-    default: 0
-  },
+  votes: [VoteSchema],
   createdAt: {
     type: Date,
     default: Date.now
@@ -46,19 +52,18 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
-  upvotes: {
-    type: Number,
-    default: 0
-  },
-  downvotes: {
-    type: Number,
-    default: 0
-  },
+  votes: [VoteSchema],
   answers: [AnswerSchema],
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
+// Indexes
+QuestionSchema.index({ createdAt: -1 }); // For sorting by newest
+QuestionSchema.index({ title: 'text', body: 'text', tags: 'text' }); // For text search
+QuestionSchema.index({ 'answers._id': 1 }); // For finding answers by ID
+QuestionSchema.index({ author: 1 }); // For finding questions by author
 
 module.exports = mongoose.model('Question', QuestionSchema); 

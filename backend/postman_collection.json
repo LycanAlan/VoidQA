@@ -10,6 +10,20 @@
 			"item": [
 				{
 					"name": "Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -20,7 +34,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"strongpassword123\"\n}"
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"strongpassword123\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/auth/signup",
@@ -37,6 +51,20 @@
 				},
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -160,6 +188,45 @@
 					}
 				},
 				{
+					"name": "Vote on Question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"voteType\": \"upvote\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/questions/{{questionId}}/vote",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"{{questionId}}",
+								"vote"
+							]
+						},
+						"description": "Vote on a question (upvote or downvote)"
+					}
+				},
+				{
 					"name": "Add Answer to Question",
 					"request": {
 						"auth": {
@@ -198,6 +265,50 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Answers",
+			"item": [
+				{
+					"name": "Vote on Answer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"voteType\": \"upvote\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/answers/{{answerId}}/vote",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"{{answerId}}",
+								"vote"
+							]
+						},
+						"description": "Vote on an answer (upvote or downvote)"
+					}
+				}
+			]
 		}
 	],
 	"variable": [
@@ -213,6 +324,11 @@
 		},
 		{
 			"key": "questionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "answerId",
 			"value": "",
 			"type": "string"
 		}

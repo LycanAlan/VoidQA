@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useNavigate } from 'react-router-dom';
 
 const AskQuestion = () => {
@@ -35,16 +35,11 @@ const AskQuestion = () => {
       const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
 
       // Submit question
-      const response = await axios.post(
-        'http://localhost:5000/api/questions', 
-        { title, body, tags: tagArray },
-        { 
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          } 
-        }
-      );
+      const response = await axios.post('/questions', { 
+        title, 
+        body, 
+        tags: tagArray 
+      });
 
       // Redirect to home page or question detail page
       navigate('/');

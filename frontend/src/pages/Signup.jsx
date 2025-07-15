@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios from '../utils/axiosConfig'
 
 function Signup({ setIsLoggedIn }) {
   const [email, setEmail] = useState('')
@@ -37,7 +37,7 @@ function Signup({ setIsLoggedIn }) {
       setIsLoading(true)
       
       // Call backend signup API
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+      const response = await axios.post('/auth/signup', {
         email,
         password
       })

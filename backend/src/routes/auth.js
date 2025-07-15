@@ -8,12 +8,20 @@ const router = express.Router();
 // Signup Route
 router.post('/signup', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ 
+      $or: [
+        { email },
+        { username }
+      ]
+    });
+    
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ 
+        message: existingUser.email === email ? 'Email already exists' : 'Username already exists'
+      });
     }
 
     // Hash password
@@ -22,6 +30,7 @@ router.post('/signup', async (req, res) => {
 
     // Create new user
     const newUser = new User({
+      username,
       email,
       password: hashedPassword
     });
@@ -30,7 +39,7 @@ router.post('/signup', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: newUser._id, email: newUser.email, role: newUser.role },
+      { id: newUser._id, email: newUser.email, username: newUser.username, role: newUser.role },
       process.env.JWT_SECRET || 'your_jwt_secret',
       { expiresIn: '1d' }
     );
@@ -40,7 +49,8 @@ router.post('/signup', async (req, res) => {
       token,
       user: { 
         id: newUser._id, 
-        email: newUser.email, 
+        email: newUser.email,
+        username: newUser.username,
         role: newUser.role 
       } 
     });
@@ -68,7 +78,7 @@ router.post('/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email, username: user.username, role: user.role },
       process.env.JWT_SECRET || 'your_jwt_secret',
       { expiresIn: '1d' }
     );
@@ -78,7 +88,8 @@ router.post('/login', async (req, res) => {
       token,
       user: { 
         id: user._id, 
-        email: user.email, 
+        email: user.email,
+        username: user.username,
         role: user.role 
       } 
     });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
@@ -11,8 +11,20 @@ const HomePage = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/questions');
-        setQuestions(response.data);
+        const response = await axios.get('/questions');
+        // Transform the response to include vote count
+        const questionsWithVotes = response.data.map(question => {
+          // Calculate total votes
+          const voteCount = Array.isArray(question.votes) 
+            ? question.votes.reduce((acc, vote) => acc + (vote.type === 'upvote' ? 1 : -1), 0)
+            : 0;
+          
+          return {
+            ...question,
+            voteCount // Store calculated vote count
+          };
+        });
+        setQuestions(questionsWithVotes);
         setIsLoading(false);
       } catch (err) {
         setError('Failed to fetch questions');
@@ -69,32 +81,47 @@ const HomePage = () => {
       ) : (
         <div className="space-y-4">
           {questions.map((question) => (
-            <div 
+            <Link 
+              to={`/questions/${question._id}`}
               key={question._id} 
-              className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="block"
             >
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                {question.title}
-              </h2>
-              <p className="text-gray-600 mb-4 line-clamp-2">
-                {question.body}
-              </p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  {question.tags && question.tags.map((tag) => (
-                    <span 
-                      key={tag} 
-                      className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-500">
-                  Asked by {question.author?.username || 'Anonymous'}
+              <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start">
+                  <div className="flex-grow">
+                    <h2 className="text-xl font-semibold text-blue-600 hover:text-blue-800 mb-2">
+                      {question.title}
+                    </h2>
+                    <p className="text-gray-600 mb-4 line-clamp-2">
+                      {question.body}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center space-x-2">
+                        {question.tags && question.tags.map((tag) => (
+                          <span 
+                            key={tag} 
+                            className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Asked by {question.author?.username || question.author?.email?.split('@')[0] || 'Anonymous'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ml-4 text-right">
+                    <div className="text-gray-600">
+                      {question.answers?.length || 0} answers
+                    </div>
+                    <div className={`text-gray-600 mt-1 ${question.voteCount !== 0 ? (question.voteCount > 0 ? 'text-green-600' : 'text-red-600') : ''}`}>
+                      {question.voteCount > 0 ? `+${question.voteCount}` : question.voteCount} votes
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
