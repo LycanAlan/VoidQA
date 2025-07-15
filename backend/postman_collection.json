@@ -1,40 +1,15 @@
 {
 	"info": {
-		"_postman_id": "voidqa-questions-api",
+		"_postman_id": "voidqa-questions-collection",
 		"name": "VoidQA Questions API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"description": "Postman Collection for VoidQA Questions Endpoints"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Authentication",
 			"item": [
 				{
-					"name": "User Signup",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"strongpassword123\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:5000/api/auth/signup",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "auth", "signup"]
-						},
-						"description": "Register a new user account"
-					}
-				},
-				{
-					"name": "User Login",
+					"name": "Signup",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -48,13 +23,43 @@
 							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"strongpassword123\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/auth/login",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "auth", "login"]
+							"raw": "{{baseUrl}}/api/auth/signup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"strongpassword123\"\n}"
 						},
-						"description": "Login and receive JWT token"
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
 					}
 				}
 			]
@@ -63,66 +68,18 @@
 			"name": "Questions",
 			"item": [
 				{
-					"name": "Create Question - Success",
+					"name": "Create Question",
 					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"description": "JWT token from login response"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"How to master React in 2024?\",\n    \"body\": \"I'm looking for the most efficient way to learn React and become a proficient developer. What resources and learning path would you recommend?\",\n    \"tags\": [\"react\", \"web-development\", \"learning\"]\n}"
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
 						},
-						"url": {
-							"raw": "http://localhost:5000/api/questions",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "questions"]
-						},
-						"description": "Successfully create a new question (requires authentication)"
-					}
-				},
-				{
-					"name": "Create Question - Missing Fields",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"description": "JWT token from login response"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"\",\n    \"body\": \"\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:5000/api/questions",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "questions"]
-						},
-						"description": "Attempt to create a question with missing required fields"
-					}
-				},
-				{
-					"name": "Create Question - Unauthorized",
-					"request": {
 						"method": "POST",
 						"header": [
 							{
@@ -132,31 +89,112 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Unauthorized Question\",\n    \"body\": \"This should fail without a token\"\n}"
+							"raw": "{\n    \"title\": \"How do I use React hooks?\",\n    \"body\": \"I'm struggling to understand the basics of React hooks. Can someone explain?\",\n    \"tags\": [\"react\", \"hooks\", \"javascript\"]\n}"
 						},
 						"url": {
-							"raw": "http://localhost:5000/api/questions",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "questions"]
-						},
-						"description": "Attempt to create a question without authentication"
+							"raw": "{{baseUrl}}/api/questions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions"
+							]
+						}
 					}
 				},
 				{
-					"name": "Get All Questions",
+					"name": "List All Questions",
 					"request": {
 						"method": "GET",
-						"header": [],
 						"url": {
-							"raw": "http://localhost:5000/api/questions",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5000",
-							"path": ["api", "questions"]
+							"raw": "{{baseUrl}}/api/questions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Questions",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/questions/search?query=react",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "react"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Single Question",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/questions/{{questionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"{{questionId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Answer to Question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
 						},
-						"description": "Retrieve the 20 most recent questions"
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"body\": \"Here's a detailed explanation of React hooks...\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/questions/{{questionId}}/answers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"{{questionId}}",
+								"answers"
+							]
+						}
 					}
 				}
 			]
@@ -164,10 +202,19 @@
 	],
 	"variable": [
 		{
-			"key": "jwt_token",
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
 			"value": "",
-			"type": "string",
-			"description": "JWT token obtained from login"
+			"type": "string"
+		},
+		{
+			"key": "questionId",
+			"value": "",
+			"type": "string"
 		}
 	]
 } 

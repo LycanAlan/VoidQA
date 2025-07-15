@@ -1,5 +1,30 @@
 const mongoose = require('mongoose');
 
+const AnswerSchema = new mongoose.Schema({
+  body: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  upvotes: {
+    type: Number,
+    default: 0
+  },
+  downvotes: {
+    type: Number,
+    default: 0
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const QuestionSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -29,6 +54,7 @@ const QuestionSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  answers: [AnswerSchema],
   createdAt: {
     type: Date,
     default: Date.now
